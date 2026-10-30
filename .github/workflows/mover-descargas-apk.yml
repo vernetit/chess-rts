@@ -32,8 +32,13 @@ jobs:
           gradle-version: '8.7'
       - name: Instalar SDK Android
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit 2>/dev/null)"
+          if [ -z "$SDKMANAGER" ]; then echo "::error::No se encuentra sdkmanager en $SDK_ROOT"; exit 1; fi
+          echo "Usando $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
       - run: gradle --no-daemon assembleDebug
       - uses: actions/upload-artifact@v4
         with:
