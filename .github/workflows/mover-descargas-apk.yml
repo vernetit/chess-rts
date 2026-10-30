@@ -18,7 +18,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Extraer fuentes del ZIP
         run: |
-          if [ -f source.zip ]; then unzip -o source.zip -d .; fi
+          for file in mover-descargas-modular-*.zip source.zip; do
+            if [ -f "$file" ]; then unzip -o "$file" -d .; fi
+          done
           test -f settings.gradle
           test -f app/build.gradle
       - uses: actions/setup-java@v4
