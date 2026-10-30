@@ -16,6 +16,11 @@ jobs:
         working-directory: android/mover-descargas
     steps:
       - uses: actions/checkout@v4
+      - name: Extraer fuentes del ZIP
+        run: |
+          if [ -f source.zip ]; then unzip -o source.zip -d .; fi
+          test -f settings.gradle
+          test -f app/build.gradle
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
