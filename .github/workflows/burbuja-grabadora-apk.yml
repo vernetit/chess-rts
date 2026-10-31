@@ -3,22 +3,29 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'burbuja-grabadora/**'
+      - 'burbuja-grabadora-modular-47392-hornero.zip'
       - '.github/workflows/burbuja-grabadora-apk.yml'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: burbuja-grabadora
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      - name: Build APK debug
+      - name: Descomprimir proyecto original
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f burbuja-grabadora-modular-47392-hornero.zip
+          mkdir -p extracted
+          unzip -q burbuja-grabadora-modular-47392-hornero.zip -d extracted
+          test -f extracted/Burbuja/gradlew
+          test -f extracted/Burbuja/app/build.gradle
+      - name: Compilar APK
+        working-directory: extracted/Burbuja
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon assembleDebug
@@ -26,5 +33,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: burbuja-grabadora-android13
-          path: burbuja-grabadora/app/build/outputs/apk/debug/*.apk
+          path: extracted/Burbuja/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
